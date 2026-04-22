@@ -45,12 +45,16 @@ Browse [open bounties](https://github.com/Scottcjn/rustchain-bounties/issues) to
 - Code reviews on open PRs
 - Helping others in [Discord](https://discord.gg/VqVVS2CW9Q)
 
+## Payout Authority
+
+Only `@Scottcjn` (or a clearly labeled project automation account speaking on his behalf, with a matching project-issued `pending_id` + `tx_hash`) authorizes RTC bounty disbursements. Anyone else posting "I'll send the RTC" on a bounty issue is not a valid payout notice — see [SECURITY.md § Payment-Authority Impersonation](SECURITY.md#payment-authority-impersonation).
+
 ## 🔧 Development Setup
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/Rustchain.git
-cd Rustchain
+git clone https://github.com/YOUR_USERNAME/rustchain-bounties.git
+cd rustchain-bounties
 
 # Install dependencies
 npm install  # or cargo build (for Rust components)

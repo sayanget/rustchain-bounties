@@ -3,35 +3,44 @@
  * RustChain Development Tools — VS Code Extension
  *
  * Provides:
- * - RTC balance display in the status bar
- * - RustChain config file syntax highlighting
- * - Code snippets for RustChain development
+ * - RTC balance display in the status bar           (BalanceStatusBar)
+ * - Miner attestation status (🟢/🔴) in status bar  (MinerStatusBar)
+ * - Epoch countdown timer in status bar              (EpochTimer)
+ * - Bounty Browser webview panel                     (BountyBrowserPanel)
+ * - Sidebar Tree Data Provider for Bounties          (BountyBrowserProvider)
+ * - Node health / epoch info command
  *
- * Bounty: #1619
+ * Bounty: #2868
  */
 
 import * as vscode from "vscode";
 import { BalanceStatusBar } from "./balanceStatusBar";
 import { NodeHealthChecker } from "./nodeHealth";
-import { BountyBrowserProvider } from "./bountyBrowser";
+import { MinerStatusBar } from "./minerStatus";
+import { EpochTimer } from "./epochTimer";
+import { BountyBrowserPanel, BountyBrowserProvider } from "./bountyBrowser";
 
 let balanceStatusBar: BalanceStatusBar | undefined;
+let minerStatusBar: MinerStatusBar | undefined;
+let epochTimer: EpochTimer | undefined;
 let nodeHealthChecker: NodeHealthChecker | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
-    const config = vscode.workspace.getConfiguration("rustchain");
-
-    // --- Status bar: RTC balance ---
+    // ── Status bar items ────────────────────────────────────────────────────
     balanceStatusBar = new BalanceStatusBar(context);
+    minerStatusBar   = new MinerStatusBar(context);
+    epochTimer       = new EpochTimer(context);
 
-    // --- Node health checker ---
+    // ── Services ─────────────────────────────────────────────────────────────
     nodeHealthChecker = new NodeHealthChecker();
 
-    // --- Bounty Browser ---
+    // ── Bounty Sidebar ───────────────────────────────────────────────────────
     const bountyProvider = new BountyBrowserProvider();
-    vscode.window.registerTreeDataProvider('rustchain-bounties', bountyProvider);
+    vscode.window.registerTreeDataProvider("rustchain-bounties", bountyProvider);
 
-    // --- Commands ---
+    // ── Commands ─────────────────────────────────────────────────────────────
+
+    // Refresh wallet balance
     context.subscriptions.push(
         vscode.commands.registerCommand("rustchain.refreshBalance", () => {
             balanceStatusBar?.refresh();
@@ -39,19 +48,8 @@ export function activate(context: vscode.ExtensionContext): void {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand("rustchain.openBounty", (url: string) => {
-            vscode.env.openExternal(vscode.Uri.parse(url));
-        }),
-    );
-
-    context.subscriptions.push(
-        vscode.commands.registerCommand("rustchain.refreshBounties", () => {
-            bountyProvider.refresh();
-        }),
-    );
-
-    context.subscriptions.push(
         vscode.commands.registerCommand("rustchain.setMinerId", async () => {
+            const config = vscode.workspace.getConfiguration("rustchain");
             const current = config.get<string>("minerId", "");
             const minerId = await vscode.window.showInputBox({
                 prompt: "Enter your RustChain miner/wallet ID",
@@ -59,25 +57,41 @@ export function activate(context: vscode.ExtensionContext): void {
                 value: current,
             });
             if (minerId !== undefined) {
-                await vscode.workspace
-                    .getConfiguration("rustchain")
-                    .update("minerId", minerId, vscode.ConfigurationTarget.Global);
+                await config.update("minerId", minerId, vscode.ConfigurationTarget.Global);
                 balanceStatusBar?.refresh();
+                minerStatusBar?.onConfigChange();
             }
         }),
     );
 
+    // Check node health (shows modal with health + epoch info)
     context.subscriptions.push(
         vscode.commands.registerCommand("rustchain.checkNodeHealth", async () => {
             await nodeHealthChecker?.showHealth();
         }),
     );
 
-    // React to configuration changes.
+    // Open Bounty Browser panel
+    context.subscriptions.push(
+        vscode.commands.registerCommand("rustchain.openBountyBrowser", () => {
+            BountyBrowserPanel.createOrShow(context.extensionUri);
+        }),
+    );
+
+    // Refresh Bounties (Both Sidebar and Webview)
+    context.subscriptions.push(
+        vscode.commands.registerCommand("rustchain.refreshBounties", () => {
+            bountyProvider.refresh();
+            BountyBrowserPanel.currentPanel?.refresh();
+        }),
+    );
+
+    // ── Config change listener ────────────────────────────────────────────────
     context.subscriptions.push(
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration("rustchain")) {
                 balanceStatusBar?.onConfigChange();
+                minerStatusBar?.onConfigChange();
             }
         }),
     );
@@ -86,5 +100,9 @@ export function activate(context: vscode.ExtensionContext): void {
 export function deactivate(): void {
     balanceStatusBar?.dispose();
     balanceStatusBar = undefined;
+    minerStatusBar?.dispose();
+    minerStatusBar = undefined;
+    epochTimer?.dispose();
+    epochTimer = undefined;
     nodeHealthChecker = undefined;
 }

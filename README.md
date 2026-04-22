@@ -13,7 +13,7 @@
 
 [![Total Paid](https://img.shields.io/badge/Total%20Paid-22%2C756%20RTC-gold)](BOUNTY_LEDGER.md)
 
-[Browse All Bounties](https://github.com/Scottcjn/rustchain-bounties/issues?q=is%3Aissue+is%3Aopen+label%3Abounty) · [Easy Bounties](https://github.com/Scottcjn/rustchain-bounties/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) · [Red Team](https://github.com/Scottcjn/rustchain-bounties/issues?q=is%3Aissue+is%3Aopen+label%3Ared-team) · [Payout Ledger](BOUNTY_LEDGER.md) · [What is RustChain?](https://github.com/Scottcjn/RustChain)
+[Browse All Bounties](https://github.com/Scottcjn/rustchain-bounties/issues?q=is%3Aissue+is%3Aopen+label%3Abounty) · [Easy Bounties](https://github.com/Scottcjn/rustchain-bounties/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) · [Red Team](https://github.com/Scottcjn/rustchain-bounties/issues?q=is%3Aissue+is%3Aopen+label%3Ared-team) · [**How to Submit →**](docs/HOW_TO_SUBMIT_A_BOUNTY.md) · [Payout Ledger](BOUNTY_LEDGER.md) · [What is RustChain?](https://github.com/Scottcjn/RustChain)
 
 </div>
 
@@ -47,6 +47,8 @@ Comment on the issue: **"I would like to work on this"**
 
 ### 4. Get Paid
 Once verified, RTC is sent to your wallet. First time? We will help you set one up.
+
+> ⚠️ **Payout safety**: Only `@Scottcjn` (or clearly labeled project automation on his behalf) authorizes RTC bounty payouts, with a project-issued `pending_id` + `tx_hash`. Anyone else posting "I'll send the RTC" on your bounty is a social-engineering attempt — see [SECURITY.md § Payment-Authority Impersonation](SECURITY.md#payment-authority-impersonation).
 
 ## Bounty Categories
 

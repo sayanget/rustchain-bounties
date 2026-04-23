@@ -62,6 +62,11 @@
           "type": "boolean",
           "default": false,
           "description": "Enforce TLS certificate validation (the default node uses a self-signed cert)."
+        },
+        "rustchain.githubToken": {
+          "type": "string",
+          "default": "",
+          "description": "Optional GitHub Personal Access Token to increase API rate limits for the Bounty Board."
         }
       }
     },

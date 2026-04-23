@@ -97,10 +97,21 @@ function httpGet<T>(path: string, timeoutMs: number = 10_000): Promise<T> {
 }
 
 function httpsGet<T>(url: string, timeoutMs: number = 10_000): Promise<T> {
+    const config = vscode.workspace.getConfiguration("rustchain");
+    const token = config.get<string>("githubToken", "");
+    
     return new Promise((resolve, reject) => {
+        const headers: Record<string, string> = {
+            "User-Agent": "RustChain-VSCode-Extension/0.2.0"
+        };
+        
+        if (token) {
+            headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const options = {
             timeout: timeoutMs,
-            headers: { "User-Agent": "RustChain-VSCode-Extension/0.2.0" },
+            headers
         };
         const req = https.get(url, options, (res) => {
             if (res.statusCode && (res.statusCode < 200 || res.statusCode >= 300)) {
